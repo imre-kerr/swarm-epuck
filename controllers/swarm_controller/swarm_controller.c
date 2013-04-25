@@ -22,6 +22,7 @@ int main(){
 	WbDeviceTag distance_sensors[NUM_SENSORS];
 	WbDeviceTag light_sensors[NUM_SENSORS];
 	double distance_sensor_data[NUM_SENSORS];
+	double previous_distance_sensor_data[NUM_SENSORS];
 	int light_sensor_data[NUM_SENSORS];
 	
 	//Setup sensors
@@ -37,6 +38,7 @@ int main(){
 	
 	for(i = 0; i < NUM_SENSORS; i++){
 		distance_sensor_data[i] = wb_distance_sensor_get_value(distance_sensors[i]);
+		previous_distance_sensor_data[i] = wb_distance_sensor_get_value(distance_sensors[i]);
 	}
 	
 	for(i = 0; i < NUM_SENSORS; i++){
@@ -47,18 +49,26 @@ int main(){
 		wb_robot_step(TIME_STEP);
 		update_search_speed(distance_sensor_data, DISTANCE_TRESHOLD);
 		swarm_retrieval(light_sensor_data, DETECTION_TRESHOLD);
+		valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 		
 		int case2 = 0;
 		for(i = 0; i < NUM_SENSORS && !(case2 = light_sensor_data[i] < DETECTION_TRESHOLD); i++);
 		
 		if(case2){
-			printf("Oh yes!");
-			wb_differential_wheels_set_speed(MIN(get_retrieval_left_wheel_speed(), 1000), MIN(get_retrieval_right_wheel_speed(), 1000));
+			if(get_stagnation_state()){
+				printf("Recovering\n");
+				stagnation_recovery(distance_sensor_data, DISTANCE_TRESHOLD);
+				wb_differential_wheels_set_speed(get_stagnation_left_wheel_speed(), get_stagnation_right_wheel_speed());
+			} else {
+				wb_differential_wheels_set_speed(MIN(get_retrieval_left_wheel_speed(), 1000), MIN(get_retrieval_right_wheel_speed(), 1000));
+			}
 		} else {
 			wb_differential_wheels_set_speed(get_search_left_wheel_speed(), get_search_right_wheel_speed());
 		}
 		
+		
 		for(i = 0; i < NUM_SENSORS; i++){
+			previous_distance_sensor_data[i] = distance_sensor_data[i];
 			distance_sensor_data[i] = wb_distance_sensor_get_value(distance_sensors[i]);
 		}
 		
