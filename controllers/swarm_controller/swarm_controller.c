@@ -49,14 +49,16 @@ int main(){
 		wb_robot_step(TIME_STEP);
 		update_search_speed(distance_sensor_data, DISTANCE_TRESHOLD);
 		swarm_retrieval(light_sensor_data, DETECTION_TRESHOLD);
+		if(get_stagnation_state()){
+			reset_stagnation();
+		}
 		valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 		
 		int case2 = 0;
 		for(i = 0; i < NUM_SENSORS && !(case2 = light_sensor_data[i] < DETECTION_TRESHOLD); i++);
 		
 		if(case2){
-			if(get_stagnation_state()){
-				printf("Recovering\n");
+			if(!get_stagnation_state()){
 				stagnation_recovery(distance_sensor_data, DISTANCE_TRESHOLD);
 				wb_differential_wheels_set_speed(get_stagnation_left_wheel_speed(), get_stagnation_right_wheel_speed());
 			} else {
