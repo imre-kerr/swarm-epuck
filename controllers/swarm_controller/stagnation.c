@@ -59,6 +59,8 @@ void LED_blink()
 
 void realign(double distance_value[8])
 {
+	printf("Realigning\n");
+
 	// Find the difference of the two front IR sensors
 	int dist_diff_front = distance_value[7] - distance_value[0];
 
@@ -114,6 +116,8 @@ void realign(double distance_value[8])
 
 void find_new_spot(double distance_value[8], int DIST_THRESHOLD)
 {
+	printf("Finding new spot\n");
+
 	if(twice == 2) // Reverse, Turn, Forward, Turn(opposite), Forward.
 	{
 		has_recovered = TRUE;
