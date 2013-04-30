@@ -75,13 +75,14 @@ int main(){
 				swarm_retrieval(light_sensor_data, DETECTION_TRESHOLD);
 				wb_differential_wheels_set_speed(MIN(get_retrieval_left_wheel_speed(), 1000), MIN(get_retrieval_right_wheel_speed(), 1000));
 			} else {
+				printf("Heyooo\n");
 				wb_differential_wheels_set_speed(0, 0);
 				wb_robot_step(TIME_STEP);
 				update_sensors();
 				reset_stagnation();
 				valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 				stagnated = 0;
-				while(get_stagnation_state){
+				while(get_stagnation_state()){
 					stagnation_recovery(distance_sensor_data, DISTANCE_TRESHOLD);
 					wb_differential_wheels_set_speed(get_stagnation_left_wheel_speed(), get_stagnation_right_wheel_speed());
 					wb_robot_step(TIME_STEP);
@@ -94,7 +95,7 @@ int main(){
 				}
 				timed_review = ((5./(10-feedback))*100)+50;
 			}
-			counter %= counter + 1;
+			counter = (counter + 1) % timed_review;
 		} else {
 			update_search_speed(distance_sensor_data, DISTANCE_TRESHOLD);
 			wb_differential_wheels_set_speed(get_search_left_wheel_speed(), get_search_right_wheel_speed());
