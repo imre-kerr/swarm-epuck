@@ -75,7 +75,7 @@ int main(){
 				swarm_retrieval(light_sensor_data, DETECTION_TRESHOLD);
 				wb_differential_wheels_set_speed(MIN(get_retrieval_left_wheel_speed(), 1000), MIN(get_retrieval_right_wheel_speed(), 1000));
 			} else {
-				printf("Heyooo\n");
+				//printf("Heyooo\n");
 				wb_differential_wheels_set_speed(0, 0);
 				wb_robot_step(TIME_STEP);
 				update_sensors();
@@ -94,7 +94,7 @@ int main(){
 				} else {
 					feedback = MAX(feedback-1, 1);
 				}
-				timed_review = ((5./(10-feedback))*100)+50;
+				timed_review = (((5./(10-feedback))*100)+50)/2;
 			}
 			counter = (counter + 1) % timed_review;
 		} else {
