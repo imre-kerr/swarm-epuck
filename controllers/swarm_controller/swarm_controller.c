@@ -13,7 +13,7 @@
 #define TIME_STEP 32
 #define NUM_SENSORS 8
 #define DISTANCE_TRESHOLD 250
-#define DETECTION_TRESHOLD 3700
+#define DETECTION_TRESHOLD 3000
 
 int main(){
 	int i;
@@ -39,25 +39,27 @@ int main(){
 	for(i = 0; i < NUM_SENSORS; i++){
 		distance_sensor_data[i] = wb_distance_sensor_get_value(distance_sensors[i]);
 		previous_distance_sensor_data[i] = wb_distance_sensor_get_value(distance_sensors[i]);
-	}
-	
-	for(i = 0; i < NUM_SENSORS; i++){
 		light_sensor_data[i] = (int) wb_light_sensor_get_value(light_sensors[i]);
 	}
+	
 	
 	while(1){
 		wb_robot_step(TIME_STEP);
 		update_search_speed(distance_sensor_data, DISTANCE_TRESHOLD);
 		swarm_retrieval(light_sensor_data, DETECTION_TRESHOLD);
-		if(get_stagnation_state()){
-			reset_stagnation();
-		}
-		valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
+		// if(get_stagnation_state()){
+			// reset_stagnation();
+		// }
+		// valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 		
 		int case2 = 0;
 		for(i = 0; i < NUM_SENSORS && !(case2 = light_sensor_data[i] < DETECTION_TRESHOLD); i++);
 		
 		if(case2){
+			if(get_stagnation_state()){
+				reset_stagnation();
+			}
+			valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 			if(!get_stagnation_state()){
 				stagnation_recovery(distance_sensor_data, DISTANCE_TRESHOLD);
 				wb_differential_wheels_set_speed(get_stagnation_left_wheel_speed(), get_stagnation_right_wheel_speed());

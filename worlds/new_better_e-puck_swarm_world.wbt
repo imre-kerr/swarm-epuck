@@ -164,9 +164,9 @@ DEF FOOD Solid {
   translation 0 0.1 0
   children [
     PointLight {
-      attenuation 0 0 4
+      attenuation 0 0 2
       color 1 0 0
-      intensity 0.055
+      intensity 0.04
       radius 0.01
       castShadows TRUE
     }
