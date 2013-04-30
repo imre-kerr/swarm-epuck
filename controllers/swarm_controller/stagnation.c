@@ -19,7 +19,7 @@
 #define IR_DIFF_THRESHOLD 4
 #define DISTANCE_DIFF_THRESHOLD 10
 #define REVERSE_LIMIT 20
-#define TURN_LIMIT 5
+#define TURN_LIMIT 10
 #define FORWARD_LIMIT 40
 #define NEIGHBOR_LIMIT 300
 
@@ -157,6 +157,7 @@ void find_new_spot(double distance_value[8], int DIST_THRESHOLD)
 	}
 	else if(forward_counter != FORWARD_LIMIT)
 	{
+		printf("forward_counter: %d, %d\n", forward_counter, DIST_THRESHOLD);
 		forward_counter = forward_counter +1;
 		if(forward_counter == FORWARD_LIMIT-1)
 		{

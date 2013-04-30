@@ -83,6 +83,7 @@ int main(){
 				valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
 				stagnated = 0;
 				while(get_stagnation_state()){
+					update_sensors();
 					stagnation_recovery(distance_sensor_data, DISTANCE_TRESHOLD);
 					wb_differential_wheels_set_speed(get_stagnation_left_wheel_speed(), get_stagnation_right_wheel_speed());
 					wb_robot_step(TIME_STEP);
