@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "retrieval.h"
 #include "search.h"
-#include "stagnation.h"
+#include "stagnation_accelerometer.h"
 
 #define MIN(A, B) (A<B?A:B)
 #define MAX(A, B) (A>B?A:B)
@@ -21,6 +21,7 @@ int stagnated = 0;
 
 WbDeviceTag distance_sensors[NUM_SENSORS];
 WbDeviceTag light_sensors[NUM_SENSORS];
+WbDeviceTag accelerometer;
 double distance_sensor_data[NUM_SENSORS];
 double previous_distance_sensor_data[NUM_SENSORS];
 int light_sensor_data[NUM_SENSORS];
@@ -43,7 +44,7 @@ int main(){
 	wb_robot_init();
 	
 	//Setup sensors
-	char sensor_name[10];
+	char sensor_name[20];
 	for(i = 0; i < NUM_SENSORS; i++){
 		sprintf(sensor_name, "ps%d", i);
 		distance_sensors[i] = wb_robot_get_device(sensor_name);
@@ -52,6 +53,9 @@ int main(){
 		light_sensors[i] = wb_robot_get_device(sensor_name);
 		wb_light_sensor_enable(light_sensors[i], TIME_STEP);
 	}
+	sprintf(sensor_name, "accelerometer");
+	accelerometer = wb_robot_get_device(sensor_name);
+	wb_accelerometer_enable(accelerometer, TIME_STEP);
 	
 	wb_robot_step(TIME_STEP);
 	
@@ -79,7 +83,7 @@ int main(){
 				wb_robot_step(TIME_STEP);
 				update_sensors();
 				reset_stagnation();
-				valuate_pushing(distance_sensor_data, previous_distance_sensor_data);
+				valuate_pushing(distance_sensor_data, wb_accelerometer_get_values(accelerometer));
 				stagnated = 0;
 				while(get_stagnation_state()){
 					update_sensors();
