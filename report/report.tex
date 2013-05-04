@@ -1,6 +1,5 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{graphicx}
-\usepackage[cm]{fullpage}
 \author{Didrik Jonassen, Imre Kerr\vspace{-2ex}}
 \title{\vspace{-5ex}Project 4\\ IT3708 --- Subsymbolic methods in AI}
 \date{\today}
@@ -9,12 +8,55 @@
 
 \maketitle
 
-\section{Description of Code}
+\section{Description of System}
+\subsection{Code Structure}
+For our E-puck controller we decided to use the provided behavioral modules, writing our own control system in C. After setting up, the controller enters an infinite loop which goes as follows:
+\begin{itemize}
+\item{Run for one timestep.}
+\item{Check all light sensors. If the food is nowhere to be seen, we simply search randomly, avoiding collisions/walls.}
+\item{If the food is nearby, we try to retrieve it by first aligning with it and then pushing.}
+\item{Once in a while during retrieval, we check for stagnation by stopping and seeing if the food moves further away. If we detect stagnation, we try to fix this by realigning, and if that fails twice, repositioning. Note that this takes several timesteps, and the main loop will not continue until the recovery process is done.}
+\item{``Once in a while'' in the previous point is calculated using the timed review method described in \cite{thesis}. To begin with, it is 150 timesteps. If we detect stagnation, we will check sooner the next time. If we don't, we will wait longer.}
+\end{itemize}
+
+\subsection{Changes to the Environment}
+We changed the world file as follows: The attenuation coefficients for the food light source used to be [1, 0, 0], which meant that the light intensity at distance $r$ was $\frac{intensity}{1+0 r + 0 r^2}$, i.e. constant. We changed this to a more realistic [0, 0, 2], which made the intensity proportional to the inverse square of the distance (just like in real life). This meant that we could use the intensity of the measured light to detect changes in distance to the food.
+
+Also, during development and testing, we modified the e-puck code to no longer give noisy measurements from distance and light sensors. This let us get more consistent results while testing and not have to wonder if an unexpected result was due to an error or just a freak occurence. The modified files are included in the \texttt{protos} directory in the code archive, and should be placed in \texttt{[webots directory]/resources/projects/robots/e-puck/protos}. (Make sure to back up the original files first.)
 
 \section{Results}
+We decided to test several swarm sizes (three, five and seven), and see how well the e-pucks performed the task in each case.
+\subsection{Three E-pucks}
+This is the bare minimum, since two E-pucks are not powerful enough to push the box.
+
+It took about a minute before all the E-pucks found the box, and at that point they were each pushing on a different side of the box. They quickly noticed the stagnation, and repositioned to all be on the same side. This can be explained by the stagnation detection algorithm. An E-puck with one other E-puck right next to it will only enter recovery mode 50 percent of the time. Therefore the situation will converge toward all E-pucks being on the same side of the box.
+
+A common problem when using only three E-pucks was that one would be pushed around the corner of the box, on account of there not being enough room on one side of the box. Another thing that happened twice while testing was that one of the E-pucks would actually get flipped on its side and roll away. Naturally it was not able to recover from this.
+
+When none of this happened, the three E-pucks were able to push the box. However, they would often ``slide'' around the edge of the box, eventually going around the corner and starting to push from a different side. This resulted in quite a lot of pushing in circles. Eventually though, they did manage to get the box to one of the edges, after about eight minutes of fooling around.
+
+\subsection{Five E-pucks}
+Four E-pucks reached the box after only twenty seconds, with the fifth one wandering around for about a minute longer. After another forty seconds, the E-pucks had (mostly) agreed on a side to push from, and the box started moving. However, the same situation as last time occured, with E-pucks ``sliding'' around corners and pushing the box in circles. However, this was a much smaller problem now, and the box reached the edge of the arena after only three minutes. 
+
+Our theory is that in the previous scenario, the E-pucks would erroneously go into stagnation recovery, and that the resulting constant realignment is what caused the sliding behavior. This is because the way we detect avoidance is by stopping for a while and seeing if the box keeps moving. With three E-pucks, the box would of course stop moving if one of the E-pucks stopped moving, because two is not enough to push the box.
+
+\subsection{Seven E-pucks}
+After about a minute, six of the seven E-pucks had found the box, and five of them were pushing from the same side. A single E-puck was on the other side trying to ruin everyone's fun, but the five were able to make good progress on pushing the box to one side. Naturally, the side of the box was a bit cramped for five E-pucks (it barely has room for three), so the result was that eventually the E-pucks would push on two adjacent sides, moving the box diagonally. This resulted in the box taking a quarter turn, but it quickly ended up at the side of the arena after only 1 minute and 25 seconds.
 
 \section{Possible Improvements}
 
 \section{Result of Improvements}
 
+
+\begin{thebibliography}{9}
+
+\bibitem{thesis}
+  Jannik Berg \& Camilla Karud,
+  \emph{Swarm intelligence in bio-inspired
+robotics}.
+  M.Sc. thesis,
+  NTNU,
+  2011
+
+\end{thebibliography}
 \end{document}
