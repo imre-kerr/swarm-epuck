@@ -22,7 +22,7 @@
 #define TURN_LIMIT 10
 #define FORWARD_LIMIT 40
 #define NEIGHBOR_LIMIT 300
-#define ACCELEROMETER_LIMIT -0.4
+#define ACCELEROMETER_LIMIT -0.2
 
 #define ALIGN_STRAIGTH_THRESHOLD 10 // If bigger, align straight
 #define LOW_DIST_VALUE 10 // if lower (and detecting IR), the sensor is close.
@@ -191,6 +191,7 @@ void reset_stagnation()
 }
 void stagnation_recovery(double distance_sensors_value[8], int DIST_THRESHOLD)
 {
+        printf("Recovering...\n");
 	if (align_counter < 2) // Align
 	{
 		align_counter = align_counter + 1;
@@ -212,7 +213,7 @@ void valuate_pushing(double dist_value[8], const double *accelerometer_data)
 
          
         printf ("Acc: %f\n", accelerometer_data[1]);
-	if(accelerometer_data[1] < ACCELEROMETER_LIMIT)
+	if(abs(accelerometer_data[1]) > ACCELEROMETER_LIMIT)
 	{
 		has_recovered = TRUE; // Keep pushing, it is working
 		green_LED_state = OFF; // No more recovery
