@@ -2,6 +2,7 @@
 #include <webots/distance_sensor.h>
 #include <webots/differential_wheels.h>
 #include <webots/light_sensor.h>
+#include <webots/accelerometer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "retrieval.h"

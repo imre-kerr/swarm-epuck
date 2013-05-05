@@ -22,7 +22,7 @@
 #define TURN_LIMIT 10
 #define FORWARD_LIMIT 40
 #define NEIGHBOR_LIMIT 300
-#define ACCELEROMETER_LIMIT 0.08
+#define ACCELEROMETER_LIMIT -0.4
 
 #define ALIGN_STRAIGTH_THRESHOLD 10 // If bigger, align straight
 #define LOW_DIST_VALUE 10 // if lower (and detecting IR), the sensor is close.
@@ -193,14 +193,12 @@ void stagnation_recovery(double distance_sensors_value[8], int DIST_THRESHOLD)
 {
 	if (align_counter < 2) // Align
 	{
-		printf("Realigning\n");
 		align_counter = align_counter + 1;
 		realign(distance_sensors_value);
 	}
 
 	else if(align_counter > 0)// Reposition
 	{
-		printf("Finding new spot\n");
 		LED_blink();
 		find_new_spot(distance_sensors_value, DIST_THRESHOLD);
 	}
@@ -212,7 +210,9 @@ void valuate_pushing(double dist_value[8], const double *accelerometer_data)
 {	// Only assess this situation once
 	// The front IR sensors pushing against the box
 
-	if(accelerometer_data[1] > ACCELEROMETER_LIMIT)
+         
+        printf ("Acc: %f\n", accelerometer_data[1]);
+	if(accelerometer_data[1] < ACCELEROMETER_LIMIT)
 	{
 		has_recovered = TRUE; // Keep pushing, it is working
 		green_LED_state = OFF; // No more recovery
