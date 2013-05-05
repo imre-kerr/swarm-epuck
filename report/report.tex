@@ -38,12 +38,19 @@ When none of this happened, the three E-pucks were able to push the box. However
 \subsection{Five E-pucks}
 Four E-pucks reached the box after only twenty seconds, with the fifth one wandering around for about a minute longer. After another forty seconds, the E-pucks had (mostly) agreed on a side to push from, and the box started moving. However, the same situation as last time occured, with E-pucks ``sliding'' around corners and pushing the box in circles. However, this was a much smaller problem now, and the box reached the edge of the arena after only three minutes. 
 
-Our theory is that in the previous scenario, the E-pucks would erroneously go into stagnation recovery, and that the resulting constant realignment is what caused the sliding behavior. This is because the way we detect avoidance is by stopping for a while and seeing if the box keeps moving. With three E-pucks, the box would of course stop moving if one of the E-pucks stopped moving, because two is not enough to push the box.
+One theory we had was that in the previous scenario, the E-pucks would erroneously go into stagnation recovery, and that the resulting constant realignment is what caused the sliding behavior. This is because the way we detect avoidance is by stopping for a while and seeing if the box keeps moving. With three E-pucks, the box would of course stop moving if one of the E-pucks stopped moving, because two is not enough to push the box.
 
 \subsection{Seven E-pucks}
 After about a minute, six of the seven E-pucks had found the box, and five of them were pushing from the same side. A single E-puck was on the other side trying to ruin everyone's fun, but the five were able to make good progress on pushing the box to one side. Naturally, the side of the box was a bit cramped for five E-pucks (it barely has room for three), so the result was that eventually the E-pucks would push on two adjacent sides, moving the box diagonally. This resulted in the box taking a quarter turn, but it quickly ended up at the side of the arena after only 1 minute and 25 seconds.
 
 \section{Possible Improvements}
+Since stagnation detection had proved to be a problem in the past (in both the 3 and 5 E-puck scenarios), we decided to see if we could improve the situation by trying another strategy. There isn't really a good way to measure the actual speed of the E-puck in its standard configuration. A hardware solution would be ideal, such as measuring the current flowing through the motors, or an optical sensor pointed at the ground. However we don't have these available to us, so we decided instead to try using the built-in accelerometers.
+
+This may seem strange, considering that an accelerometer measures acceleration and not speed. However, by stopping and then immediately measuring the accelerometer in the Y direction (backwards/forwards), we could detect whether or not the E-puck was moving. A strong negative readout would mean that the E-puck was moving forward before it stopped.
+
+The implementation of this change did not require much coding. The accelerometer needed a bit of setup and reading, and the line that previously checked whether the box was moving away from the E-puck was changed to check for a strong acceleration in the Y direction. The modified controller can be found in the \texttt{controllers/swarm\_controller\_accelerometer} directory, and we've included a world file that has seven E-pucks all using the new controller.
+
+Another modification we would like to make, but couldn't since it is hardware related, was to change the shape of the E-puck to be more suited to the task. While poor stagnation detection was probably a part of why the three E-pucks did so poorly, we did observe that the ``sliding'' behavior mentioned did occur even when outside recovery mode. Looking at the shape of the E-puck, it's not hard to see why. Even though the retrieval module does what it can to make the E-puck push as straight as possible, it's very hard to do this perfectly. The result is that it pushes at a slight angle, and this can also cause it to slide along the edge. If the front was flat instead, it would align itself perfectly to the box and always push straight forward.
 
 \section{Result of Improvements}
 
@@ -51,7 +58,7 @@ After about a minute, six of the seven E-pucks had found the box, and five of th
 \begin{thebibliography}{9}
 
 \bibitem{thesis}
-  Jannik Berg \& Camilla Karud,
+  Jannik Berg \& Camilla Haukenes Karud,
   \emph{Swarm intelligence in bio-inspired
 robotics}.
   M.Sc. thesis,
